@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cartographie SI La Nef — Mambu/Theodo v4</title>
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;background:#f9f9f7;color:#1a1a18;padding:24px;}
+h1{font-size:17px;font-weight:600;margin-bottom:4px;}
+.subtitle{font-size:12px;color:#888;margin-bottom:20px;}
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+.filter-group{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:8px;align-items:center;}
+.filter-label{font-size:11px;color:#888;min-width:80px;}
+button{font-size:11px;padding:3px 11px;border-radius:5px;border:1px solid #ddd;background:#fff;cursor:pointer;color:#555;transition:all .12s;}
+button:hover{border-color:#aaa;}
+button.active{background:#eeedfe;color:#3C3489;border-color:#b0abdd;font-weight:600;}
+.count{font-size:12px;color:#888;margin:10px 0 6px;}
+.table-wrap{overflow-x:auto;border-radius:8px;border:1px solid #e8e8e6;background:#fff;}
+table{width:100%;border-collapse:collapse;table-layout:fixed;min-width:900px;}
+thead th{font-size:11px;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:.04em;padding:10px 10px;border-bottom:1px solid #e8e8e6;text-align:left;background:#fafaf8;}
+th:nth-child(1){width:11%;}th:nth-child(2){width:17%;}th:nth-child(3){width:13%;}
+th:nth-child(4){width:10%;}th:nth-child(5){width:9%;}th:nth-child(6){width:40%;}
+tbody tr{border-bottom:1px solid #f2f2f0;transition:background .1s;}
+tbody tr:hover{background:#fafaf8;}
+tbody tr.upd{border-left:3px solid #7F77DD;}
+tbody tr.new{border-left:3px solid #3B6D11;}
+td{padding:9px 10px;vertical-align:top;line-height:1.45;}
+td:first-child{font-size:11px;color:#888;}
+td:nth-child(2){font-weight:500;font-size:13px;}
+.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:4px;font-weight:500;white-space:nowrap;}
+.b-ok{background:#EAF3DE;color:#3B6D11;}
+.b-partial{background:#FAEEDA;color:#854F0B;}
+.b-missing{background:#FCEBEB;color:#A32D2D;}
+.b-remove{background:#F1EFE8;color:#555;}
+.b-tbd{background:#E6F1FB;color:#185FA5;}
+.b-integrator{background:#EEEDFE;color:#3C3489;}
+.b-partner{background:#FAECE7;color:#993C1D;}
+.s-high{background:#FCEBEB;color:#A32D2D;}
+.s-med{background:#FAEEDA;color:#854F0B;}
+.s-low{background:#EAF3DE;color:#3B6D11;}
+.s-na{background:#F1EFE8;color:#666;}
+.note{font-size:12px;color:#555;line-height:1.45;}
+.dl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;padding:2px 7px;border-radius:3px;white-space:nowrap;}
+.d-cbs{background:#EEEDFE;color:#3C3489;}.d-pay{background:#E1F5EE;color:#0F6E56;}
+.d-reg{background:#FAEEDA;color:#854F0B;}.d-front{background:#FAECE7;color:#993C1D;}
+.d-data{background:#E6F1FB;color:#185FA5;}.d-ops{background:#F1EFE8;color:#555;}
+.tag{font-size:10px;font-weight:600;padding:1px 5px;border-radius:3px;margin-left:4px;vertical-align:middle;}
+.tag-new{background:#EAF3DE;color:#3B6D11;}
+.tag-upd{background:#EEEDFE;color:#3C3489;}
+.footer{margin-top:16px;font-size:11px;color:#aaa;}
+</style>
+</head>
+<body>
+<h1>Cartographie SI La Nef — Analyse Mambu / Theodo</h1>
+<p class="subtitle">Version 4 — intégrant le Q&R officiel La Nef (13/05/2026) · Confidentiel</p>
+
+<div class="legend">
+  <span class="badge b-ok">En place</span>
+  <span class="badge b-partial">Partiel / à revoir</span>
+  <span class="badge b-missing">Absent Mambu</span>
+  <span class="badge b-partner">Partenaire requis</span>
+  <span class="badge b-integrator">Porté intégrateur</span>
+  <span class="badge b-remove">Disparaît avec CBS</span>
+  <span class="badge b-tbd">À qualifier</span>
+  &nbsp;&nbsp;
+  <span style="font-size:11px;color:#888;">Bordure <span style="color:#7F77DD;font-weight:600;">violette</span> = MàJ Q&A &nbsp;|&nbsp; Bordure <span style="color:#3B6D11;font-weight:600;">verte</span> = Nouvelle brique</span>
+</div>
+
+<div class="filter-group">
+  <span class="filter-label">Domaine :</span>
+  <button class="active" onclick="fD('all',this)">Tout</button>
+  <button onclick="fD('cbs',this)">Core banking</button>
+  <button onclick="fD('pay',this)">Paiements</button>
+  <button onclick="fD('reg',this)">Réglementaire</button>
+  <button onclick="fD('front',this)">Front / Distribution</button>
+  <button onclick="fD('data',this)">Data / Reporting</button>
+  <button onclick="fD('ops',this)">Ops / Infra</button>
+</div>
+<div class="filter-group">
+  <span class="filter-label">Sévérité :</span>
+  <button class="active" onclick="fS('all',this)">Toutes</button>
+  <button onclick="fS('high',this)">🔴 Élevée</button>
+  <button onclick="fS('med',this)">🟡 Moyenne</button>
+  <button onclick="fS('low',this)">🟢 Faible</button>
+  <button onclick="fS('na',this)">— N/A</button>
+</div>
+<div class="filter-group">
+  <span class="filter-label">Filtre Q&A :</span>
+  <button class="active" onclick="fC('all',this)">Tout afficher</button>
+  <button onclick="fC('upd',this)">🟣 MàJ suite Q&A</button>
+  <button onclick="fC('new',this)">🟢 Nouvelles briques</button>
+</div>
+
+<div class="count" id="cnt"></div>
+
+<div class="table-wrap">
+<table>
+<thead><tr>
+  <th>Domaine</th><th>Brique fonctionnelle</th><th>Outil actuel / cible</th>
+  <th>Statut Mambu</th><th>Sévérité</th><th>Note &amp; mitigation</th>
+</tr></thead>
+<tbody id="tb"></tbody>
+</table>
+</div>
+<p class="footer">Données issues du dossier de consultation La Nef, du transcript de qualification (13/05/2026), du Q&R officiel, et de l'analyse fonctionnelle Mambu. Usage interne Theodo / confidentiel.</p>
+
+<script>
+var R=[
+{d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Tenue de compte (parts & pros)',o:'Capital Banker',s:'b-ok',sl:'En place',sv:'na',svl:'—',n:'Couvert nativement par Mambu. À migrer en priorité.',c:''},
+{d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Crédit (conso, immo, pros)',o:'Capital Banker',s:'b-partial',sl:'Partiel / à revoir',sv:'high',svl:'Élevée',n:'Forbearance et restructurations limitées (retours Gartner). Reprise en stock (soldes ouvrants) plutôt qu\'en flux historique. 5 975 prêts amortissables + 11 739 garanties à migrer.',c:''},
+{d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Instruction de crédit',o:'Excel (pas d\'outil interfacé)',s:'b-missing',sl:'Absent Mambu',sv:'low',svl:'Faible',n:'✅ Q&A : géré sur Excel sans outil interfacé CBS. La Nef intéressée si la solution couvre ce besoin. Opportunité différenciante à proposer en option.',c:'new'},
+{d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Recouvrement / impayés',o:'Excel (pas d\'outil interfacé)',s:'b-missing',sl:'Absent Mambu',sv:'low',svl:'Faible',n:'✅ Q&A : process douteux/déclassements dans CBS, relances et recouvrement sur Excel. La Nef intéressée par automatisation si l\'outil le propose. À inclure en option.',c:'new'},
+{d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Épargne — minoration taux / dons',o:'Capital Banker',s:'b-partial',sl:'Partiel / à revoir',sv:'med',svl:'Moyenne',n:'✅ Q&A confirmé : tranches de 25% (100/75/50/25), cumulables (minoration + don). À implémenter via Mambu Functions ou paramétrage produit. À démontrer en démo. 56 500 livrets à migrer.',c:'upd'},
+{d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Parts sociales (18 exigences)',o:'Capital Banker',s:'b-missing',sl:'Absent Mambu',sv:'high',svl:'Élevée',n:'✅ Q&A : sans date de fin (pas de maturité fixe). Lacune structurelle confirmée — aucun natif Mambu. Développement custom obligatoire (module Deposits ou API). Risque programme majeur à traiter dès la Q/R.',c:'upd'},
+{d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Comptabilité générale (PCB français)',o:'Capital Banker',s:'b-partner',sl:'Partenaire requis',sv:'high',svl:'Élevée',n:'Mambu déverse la donnée comptable mais n\'implémente pas le Plan Comptable Bancaire français. Partenaire obligatoire : Aurea, SAB ou middleware vers Sage/Cegid. RACI fragmenté à clarifier. 2,5M mouvements comptables/an.',c:''},
+{d:'cbs',dl:'Core banking',dc:'d-cbs',b:'CRM / Vision client 360',o:'Hubspot + Zendesk',s:'b-partial',sl:'Partiel / à revoir',sv:'low',svl:'Faible',n:'✅ Q&A : 2 CRM en place, projet de changement CRM en cours. Interface CBS→CRM : nom client, n° client, montant avoirs, infos contact. À rebrancher sur Mambu.',c:'upd'},
+{d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Tarification (70+ exigences)',o:'Capital Banker',s:'b-partial',sl:'Partiel / à revoir',sv:'med',svl:'Moyenne',n:'Granularité française (HT/TTC/TVA, commissions d\'intervention, remises dérogatoires, tarification par canal/segment) à valider exigence par exigence. Risque de nombreux développements spécifiques.',c:''},
+{d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Workflows BPM (instructions, dérogations)',o:'Capital Banker',s:'b-partial',sl:'Partiel / à revoir',sv:'med',svl:'Moyenne',n:'Mambu Process Orchestrator pour workflows simples. Processus complexes (circuits de validation multi-niveaux, dérogations tarifaires) : BPM tiers probable (Camunda, Bonita).',c:''},
+{d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Middleware API (Capital Connect)',o:'Capital Connect (CBS)',s:'b-remove',sl:'Disparaît avec CBS',sv:'na',svl:'—',n:'Remplacé par APIs natives Mambu. Aucun développement équivalent nécessaire.',c:''},
+{d:'pay',dl:'Paiements',dc:'d-pay',b:'SEPA SCT/SDD + Instant Payments + VOP',o:'BPCE PS + Numeral',s:'b-ok',sl:'En place',sv:'na',svl:'—',n:'✅ Q&A : IP et VOP à couvrir en remplacement de Numeral. Mambu Payments Hub natif. Partenariat BPCE PS annoncé sept. 2025 (SEPA + card issuing). Verification of Payee inclus.',c:'upd'},
+{d:'pay',dl:'Paiements',dc:'d-pay',b:'Flux EBICS (relevés, émission)',o:'ELCIMAI + PROLIVAL (WeBank)',s:'b-partial',sl:'Partiel / à revoir',sv:'med',svl:'Moyenne',n:'Aujourd\'hui via CBS. À qualifier : Mambu expose-t-il EBICS nativement ou faut-il un adaptateur côté ELCIMAI/PROLIVAL ?',c:''},
+{d:'pay',dl:'Paiements',dc:'d-pay',b:'Processing carte pros (émission, autorisation)',o:'Marqeta (via Saga Corp)',s:'b-partner',sl:'Partenaire requis',sv:'med',svl:'Moyenne',n:'✅ Q&A confirmé : processeur = Marqeta, contrat porté par Saga Corp. Membre Visa : Worser Frères. CBS gère actuellement : API autorisation, tarification, compta, clearing quotidien. Carte Nef Pro lancement juin 2026 — urgent.',c:'upd'},
+{d:'pay',dl:'Paiements',dc:'d-pay',b:'Processing carte particuliers',o:'Non défini',s:'b-tbd',sl:'À qualifier',sv:'med',svl:'Moyenne',n:'✅ Q&A : La Nef revient sur ce point. BPCE PS est partenaire Mambu sur card issuing — piste naturelle à explorer pour cohérence avec carte pros.',c:'new'},
+{d:'pay',dl:'Paiements',dc:'d-pay',b:'Encaissement chèques',o:'CHEQUENET (Docaposte)',s:'b-missing',sl:'Absent Mambu',sv:'low',svl:'Faible',n:'✅ Q&A : La Nef n\'émet aucun chèque. Traite uniquement l\'encaissement à réception. Périmètre réduit. Interface CHEQUENET à maintenir.',c:'upd'},
+{d:'pay',dl:'Paiements',dc:'d-pay',b:'LCR / effets de commerce',o:'MINOS (BPCE PS)',s:'b-missing',sl:'Absent Mambu',sv:'low',svl:'Faible',n:'Pas de natif Mambu. Interface MINOS à maintenir. Aucun Swift à La Nef (confirmé Q&A).',c:''},
+{d:'pay',dl:'Paiements',dc:'d-pay',b:'Détection de fraude',o:'Prismop',s:'b-ok',sl:'En place',sv:'na',svl:'—',n:'Outil externe indépendant de CBS. Interface à rebrancher sur Mambu.',c:''},
+{d:'reg',dl:'Réglementaire',dc:'d-reg',b:'Reporting prudentiel (COREP, FINREP, RUBA, AnaCredit…)',o:'WKFS → à remplacer',s:'b-partner',sl:'Partenaire requis',sv:'med',svl:'Moyenne',n:'✅ Q&A : La Nef confirme OUI — proposer un service de reporting en remplacement de WKFS. Attente explicite. Partenaires : Regnology, BearingPoint, Vermeg. Coûts de licence à intégrer au TCO.',c:'upd'},
+{d:'reg',dl:'Réglementaire',dc:'d-reg',b:'XBRL / DORA / TRACFIN / OSCAMPS / QLB',o:'XBRL Express (Diligence)',s:'b-partial',sl:'Partiel / à revoir',sv:'med',svl:'Moyenne',n:'✅ Q&A : XBRL Express consomme déjà l\'infocentre pour TRACFIN, QLB et OSCAMPS. DORA : Mambu à inscrire au Registre d\'Information (ROI) comme prestataire TIC critique. Documentation DORA conforme à exiger contractuellement.',c:'upd'},
+{d:'reg',dl:'Réglementaire',dc:'d-reg',b:'Loi Eckert (inactifs)',o:'Capital Compliance',s:'b-ok',sl:'En place',sv:'na',svl:'—',n:'✅ Q&A : module Eckert confirmé dans le scope. Capital Compliance connecté à CBS. Interface à rebrancher sur Mambu.',c:'upd'},
+{d:'reg',dl:'Réglementaire',dc:'d-reg',b:'Mobilité bancaire',o:'Non couvert',s:'b-tbd',sl:'À qualifier',sv:'low',svl:'Faible',n:'✅ Q&A : hors scope mais intéressant — à mettre en option dans la réponse.',c:'upd'},
+{d:'reg',dl:'Réglementaire',dc:'d-reg',b:'AML / LCB-FT / gel des avoirs',o:'Capital Compliance + ERMES',s:'b-partner',sl:'Partenaire requis',sv:'med',svl:'Moyenne',n:'Mambu sans moteur AML/CFT français natif ni filtrage DG Trésor. Pattern : ComplyAdvantage (connecteur Mambu documenté), Napier, Fircosoft. Capital Compliance à remplacer.',c:''},
+{d:'reg',dl:'Réglementaire',dc:'d-reg',b:'Référentiels FR (SIRET, FICP/FCC, DG Trésor)',o:'Néant / CBS',s:'b-integrator',sl:'Porté intégrateur',sv:'med',svl:'Moyenne',n:'Pas de connecteurs natifs Mambu aux référentiels français. À intégrer via APIs côté Theodo ou middleware.',c:''},
+{d:'reg',dl:'Réglementaire',dc:'d-reg',b:'RNIPP / Synapse (personnes décédées)',o:'Synapse',s:'b-ok',sl:'En place',sv:'na',svl:'—',n:'✅ Q&A : connexion CBS très limitée — RNIPP uniquement pour personnes décédées. Interface légère à rebrancher sur Mambu.',c:'upd'},
+{d:'reg',dl:'Réglementaire',dc:'d-reg',b:'Évolutions réglementaires en RUN',o:'Absent (porté par CBS)',s:'b-integrator',sl:'Porté intégrateur',sv:'high',svl:'Élevée',n:'Mambu ne gère pas les évolutions réglementaires hors paiement. À porter par Theodo en TMA dédiée avec engagement de délai par type d\'évolution (mineur/majeur).',c:''},
+{d:'reg',dl:'Réglementaire',dc:'d-reg',b:'Hébergement cloud / conformité ACPR',o:'Hébergeur FR géré par CBS',s:'b-partial',sl:'Partiel / à revoir',sv:'high',svl:'Élevée',n:'✅ Q&A : actuellement hébergé chez un hébergeur français géré par CBS. La Nef attend hébergement en France. Mambu SaaS only / pas d\'on-premise. Notification d\'externalisation ACPR obligatoire (arrêté nov. 2014). Démonstration conformité requise.',c:'upd'},
+{d:'front',dl:'Front / Distribution',dc:'d-front',b:'Banque en ligne particuliers',o:'Capital Digital (=NET) → NefLabs',s:'b-remove',sl:'Disparaît avec CBS',sv:'na',svl:'—',n:'Remplacé par NefLabs. Refonte SEL en cours (lots 1 & 2). Branchement natif sur APIs Mambu.',c:''},
+{d:'front',dl:'Front / Distribution',dc:'d-front',b:'Banque en ligne pros (Nef PRO)',o:'Saga Corp (DSP2)',s:'b-ok',sl:'En place',sv:'na',svl:'—',n:'✅ Q&A : pas de changement prévu sur les outils banque digitale. Saga Corp reste en place. Rebrancher APIs Mambu au lieu de CBS — faible charge.',c:'upd'},
+{d:'front',dl:'Front / Distribution',dc:'d-front',b:'Souscription en ligne particuliers (SEL)',o:'Brevo + Yousign + Netheos + Docaposte',s:'b-partial',sl:'Partiel / à revoir',sv:'low',svl:'Faible',n:'Refonte en cours, déjà API-first. Premier candidat pour atterrir sur Mambu. Lot 3 à basculer.',c:''},
+{d:'front',dl:'Front / Distribution',dc:'d-front',b:'Open Banking / passerelle DSP2',o:'Outils digitaux (hors périmètre)',s:'b-ok',sl:'En place',sv:'na',svl:'—',n:'✅ Q&A : géré par outils digitaux, explicitement hors périmètre de l\'attendu.',c:'new'},
+{d:'front',dl:'Front / Distribution',dc:'d-front',b:'Éditique',o:'Docaposte (~100 docs/an)',s:'b-partner',sl:'Partenaire requis',sv:'low',svl:'Faible',n:'✅ Q&A : pas de GED attendue dans la réponse. Éditique très limitée (1 type d\'avis, ~100 docs/an via infocentre). Docaposte à conserver et interfacer avec Mambu.',c:'upd'},
+{d:'data',dl:'Data / Reporting',dc:'d-data',b:'Infocentre (NORSYS, depuis 2019)',o:'NORSYS + CBS + 2 anciens CBS',s:'b-partial',sl:'Partiel / à revoir',sv:'high',svl:'Élevée',n:'✅ Q&A : en service depuis 2019. Consommateurs : Zendesk, Hubspot, Power BI, Metabase, screening PPE, éditique, XBRL Express (TRACFIN/OSCAMPS/QLB), états de gestion salariés. La Nef dit : réaliste à remplacer mais charge importante. Inclure explicitement dans planning et RACI.',c:'upd'},
+{d:'data',dl:'Data / Reporting',dc:'d-data',b:'141 états de gestion (accès web salariés)',o:'CBS + NORSYS + interface web',s:'b-integrator',sl:'Porté intégrateur',sv:'med',svl:'Moyenne',n:'États consommés par les salariés via interface web. Stratégie : reconstruction via Power BI + data warehouse alimenté par Mambu Data Stream. Charge de qualification individuelle à anticiper.',c:''},
+{d:'data',dl:'Data / Reporting',dc:'d-data',b:'Tableaux de bord (Power BI + Metabase)',o:'Power BI + Metabase',s:'b-partial',sl:'Partiel / à revoir',sv:'low',svl:'Faible',n:'✅ Q&A : les deux outils consomment l\'infocentre. Sources à rebrancher sur Mambu Data Stream via nouvel infocentre.',c:'upd'},
+{d:'data',dl:'Data / Reporting',dc:'d-data',b:'Screening PPE',o:'Outil dédié (via infocentre)',s:'b-ok',sl:'En place',sv:'na',svl:'—',n:'✅ Q&A : consomme l\'infocentre. À rebrancher sur le nouvel infocentre alimenté par Mambu.',c:'new'},
+{d:'data',dl:'Data / Reporting',dc:'d-data',b:'Comptabilité filiales',o:'SAGE',s:'b-ok',sl:'En place',sv:'na',svl:'—',n:'Filiales uniquement — hors périmètre comptabilité générale La Nef. Impact limité.',c:''},
+{d:'ops',dl:'Ops / Infra',dc:'d-ops',b:'Cybersécurité / SOC / SIEM',o:'Sekoia (SI interne uniquement)',s:'b-partial',sl:'Partiel / à revoir',sv:'med',svl:'Moyenne',n:'✅ Q&A : Sekoia sur SI interne, pas sur machines CBS. La Nef préfère que le fournisseur ait son propre SOC, ou à minima intégration des machines CBS dans Sekoia. PAM, WAF, scans hebdo, 4 yeux à démontrer.',c:'upd'},
+{d:'ops',dl:'Ops / Infra',dc:'d-ops',b:'Batch / ordonnancement',o:'CRONTAB (40 jobs)',s:'b-partial',sl:'Partiel / à revoir',sv:'low',svl:'Faible',n:'✅ Q&A : 40 jobs via CRONTAB. Simple — pas de Control-M. Mambu End of Day process quotidien. Surveillance H24 du COB à orchestrer côté infogérant.',c:'upd'},
+{d:'ops',dl:'Ops / Infra',dc:'d-ops',b:'Environnements hors-prod',o:'Géré par CBS',s:'b-tbd',sl:'À qualifier',sv:'low',svl:'Faible',n:'✅ Q&A : données anonymisées obligatoires en hors-prod. Disponibilité heures de bureau suffisante. Proposition à formuler par l\'intégrateur en cohérence avec DORA.',c:'new'},
+{d:'ops',dl:'Ops / Infra',dc:'d-ops',b:'Migration données historiques',o:'CBS (source)',s:'b-partial',sl:'Partiel / à revoir',sv:'high',svl:'Élevée',n:'✅ Q&A : volumétrie confirmée — 500K mouvements financiers/an, 2,5M mouvements comptables/an, 6 500 ouvertures de compte/an, 128 utilisateurs dont 8 externes. Volumes faibles → conforte le Big Bang. La Nef attend recommandation de l\'intégrateur sur la stratégie de reprise.',c:'upd'},
+{d:'ops',dl:'Ops / Infra',dc:'d-ops',b:'Support français / 24h24',o:'CBS (support FR)',s:'b-partial',sl:'Partiel / à revoir',sv:'low',svl:'Faible',n:'Mambu privilégie l\'anglais et le self-service. Support 24/7 en français à négocier contractuellement avec Theodo comme point de contact principal.',c:''},
+{d:'ops',dl:'Ops / Infra',dc:'d-ops',b:'Supervision / monitoring',o:'Zabbix',s:'b-ok',sl:'En place',sv:'na',svl:'—',n:'À étendre pour superviser la plateforme Mambu SaaS.',c:''},
+];
+
+var cD='all',cS='all',cC='all';
+function fD(v,b){cD=v;document.querySelectorAll('.filter-group:nth-child(4) button').forEach(function(x){x.classList.remove('active');});b.classList.add('active');render();}
+function fS(v,b){cS=v;document.querySelectorAll('.filter-group:nth-child(5) button').forEach(function(x){x.classList.remove('active');});b.classList.add('active');render();}
+function fC(v,b){cC=v;document.querySelectorAll('.filter-group:nth-child(6) button').forEach(function(x){x.classList.remove('active');});b.classList.add('active');render();}
+
+function render(){
+  var f=R.slice();
+  if(cD!=='all')f=f.filter(function(r){return r.d===cD;});
+  if(cS!=='all')f=f.filter(function(r){return r.sv===cS;});
+  if(cC==='upd')f=f.filter(function(r){return r.c==='upd';});
+  if(cC==='new')f=f.filter(function(r){return r.c==='new';});
+  var c=document.getElementById('cnt');
+  c.textContent=f.length+' brique'+(f.length>1?'s':'')+' affichée'+(f.length>1?'s':'');
+  var ld=null,html='';
+  f.forEach(function(r){
+    var sd=r.d!==ld;ld=r.d;
+    var tag=r.c==='new'?'<span class="tag tag-new">NOUVEAU</span>':r.c==='upd'?'<span class="tag tag-upd">MÀJ</span>':'';
+    var rc=r.c==='upd'?'upd':r.c==='new'?'new':'';
+    html+='<tr class="'+rc+'">';
+    html+='<td>'+(sd?'<span class="dl '+r.dc+'">'+r.dl+'</span>':'')+'</td>';
+    html+='<td>'+r.b+tag+'</td>';
+    html+='<td class="note">'+r.o+'</td>';
+    html+='<td><span class="badge '+r.s+'">'+r.sl+'</span></td>';
+    html+='<td><span class="badge s-'+r.sv+'">'+r.svl+'</span></td>';
+    html+='<td class="note">'+r.n+'</td>';
+    html+='</tr>';
+  });
+  document.getElementById('tb').innerHTML=html;
+}
+render();
+</script>
+</body>
+</html>
