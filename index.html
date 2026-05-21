@@ -3,337 +3,451 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Cartographie SI La Nef — Mambu/Theodo v6</title>
+<title>Cartographie SI La Nef — Mambu/Theodo v5</title>
 <style>
 *{box-sizing:border-box;margin:0;padding:0;}
 body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif;font-size:13px;background:#f9f9f7;color:#1a1a18;padding:24px;}
 h1{font-size:17px;font-weight:600;margin-bottom:4px;}
 .subtitle{font-size:12px;color:#888;margin-bottom:16px;}
-.legend{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:14px;}
+
+/* === TABS === */
+.tabs{display:flex;gap:2px;margin-bottom:20px;border-bottom:2px solid #e8e8e6;}
+.tab-btn{font-size:12px;font-weight:500;padding:7px 16px;border:none;background:none;cursor:pointer;color:#888;border-bottom:2px solid transparent;margin-bottom:-2px;border-radius:4px 4px 0 0;transition:all .15s;}
+.tab-btn:hover{color:#3C3489;background:#f3f2fe;}
+.tab-btn.active{color:#3C3489;border-bottom-color:#3C3489;font-weight:600;background:#fafaf9;}
+
+.tab-panel{display:none;}
+.tab-panel.active{display:block;}
+
+/* === CARTOGRAPHIE === */
+.legend{display:flex;flex-wrap:wrap;gap:8px;margin-bottom:12px;}
 .filter-group{display:flex;flex-wrap:wrap;gap:6px;margin-bottom:7px;align-items:center;}
 .filter-label{font-size:11px;color:#888;min-width:90px;}
-button{font-size:11px;padding:3px 11px;border-radius:5px;border:1px solid #ddd;background:#fff;cursor:pointer;color:#555;transition:all .12s;}
-button:hover{border-color:#aaa;}
-button.active{background:#eeedfe;color:#3C3489;border-color:#b0abdd;font-weight:600;}
+button.filter-btn{font-size:11px;padding:3px 11px;border-radius:5px;border:1px solid #ddd;background:#fff;cursor:pointer;color:#555;transition:all .12s;}
+button.filter-btn:hover{border-color:#aaa;}
+button.filter-btn.active{background:#eeedfe;color:#3C3489;border-color:#b0abdd;font-weight:600;}
 .count{font-size:12px;color:#888;margin:10px 0 6px;}
 .table-wrap{overflow-x:auto;border-radius:8px;border:1px solid #e8e8e6;background:#fff;}
-table{width:100%;border-collapse:collapse;table-layout:fixed;min-width:1050px;}
+table{width:100%;border-collapse:collapse;table-layout:fixed;min-width:960px;}
 thead th{font-size:11px;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:.04em;padding:10px;border-bottom:1px solid #e8e8e6;text-align:left;background:#fafaf8;}
-th:nth-child(1){width:10%;}
-th:nth-child(2){width:15%;}
-th:nth-child(3){width:12%;}
-th:nth-child(4){width:18%;}
-th:nth-child(5){width:8%;}
-th:nth-child(6){width:37%;}
+th:nth-child(1){width:11%;}th:nth-child(2){width:17%;}th:nth-child(3){width:13%;}
+th:nth-child(4){width:10%;}th:nth-child(5){width:9%;}th:nth-child(6){width:11%;}th:nth-child(7){width:29%;}
 tbody tr{border-bottom:1px solid #f2f2f0;transition:background .1s;}
 tbody tr:hover{background:#fafaf8;}
 td{padding:8px 10px;vertical-align:top;line-height:1.45;}
 td:first-child{font-size:11px;color:#888;}
 td:nth-child(2){font-weight:500;font-size:13px;}
-.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:4px;font-weight:500;white-space:nowrap;margin:2px 2px 2px 0;}
-/* Importance */
-.i-critique{background:#FCEBEB;color:#A32D2D;}
-.i-moyenne{background:#FAEEDA;color:#854F0B;}
-.i-faible{background:#EAF3DE;color:#3B6D11;}
-/* Outil cible */
-.t-mambu{background:#EEEDFE;color:#3C3489;}
-.t-forest{background:#F0FAE8;color:#2D6A0A;border:1px solid #b8e09a;}
-.t-partner{background:#FAECE7;color:#993C1D;}
-.t-theodo{background:#E6F1FB;color:#185FA5;}
-.t-tbd{background:#F5F5F3;color:#666;}
-.t-out{background:#F1EFE8;color:#555;}
+
+/* === BADGES === */
+.badge{display:inline-block;font-size:11px;padding:2px 8px;border-radius:4px;font-weight:500;white-space:nowrap;}
+.b-ok{background:#EAF3DE;color:#3B6D11;}
+.b-partial{background:#FAEEDA;color:#854F0B;}
+.b-missing{background:#FCEBEB;color:#A32D2D;}
+.b-remove{background:#F1EFE8;color:#555;}
+.b-tbd{background:#E6F1FB;color:#185FA5;}
+.b-integrator{background:#EEEDFE;color:#3C3489;}
+.b-partner{background:#FAECE7;color:#993C1D;}
+.b-forest{background:#F0FAE8;color:#2D6A0A;border:1px solid #b8e09a;}
+.s-high{background:#FCEBEB;color:#A32D2D;}
+.s-med{background:#FAEEDA;color:#854F0B;}
+.s-low{background:#EAF3DE;color:#3B6D11;}
+.s-na{background:#F1EFE8;color:#666;}
 .note{font-size:12px;color:#555;line-height:1.45;}
 .dl{font-size:10px;font-weight:600;text-transform:uppercase;letter-spacing:.05em;padding:2px 7px;border-radius:3px;white-space:nowrap;}
-.d-cbs{background:#EEEDFE;color:#3C3489;}
-.d-pay{background:#E1F5EE;color:#0F6E56;}
-.d-reg{background:#FAEEDA;color:#854F0B;}
-.d-front{background:#FAECE7;color:#993C1D;}
-.d-data{background:#E6F1FB;color:#185FA5;}
-.d-ops{background:#F1EFE8;color:#555;}
+.d-cbs{background:#EEEDFE;color:#3C3489;}.d-pay{background:#E1F5EE;color:#0F6E56;}
+.d-reg{background:#FAEEDA;color:#854F0B;}.d-front{background:#FAECE7;color:#993C1D;}
+.d-data{background:#E6F1FB;color:#185FA5;}.d-ops{background:#F1EFE8;color:#555;}
+
+/* === ADR === */
+.adr-wrap{max-width:900px;}
+.adr-header{margin-bottom:24px;}
+.adr-header h2{font-size:18px;font-weight:700;color:#1a1a18;margin-bottom:6px;}
+.adr-meta{font-size:12px;color:#888;display:flex;gap:16px;flex-wrap:wrap;}
+.adr-meta span{display:flex;align-items:center;gap:4px;}
+
+.adr-section{margin-bottom:28px;}
+.adr-section-title{font-size:11px;font-weight:700;text-transform:uppercase;letter-spacing:.08em;color:#888;margin-bottom:10px;padding-bottom:6px;border-bottom:1px solid #e8e8e6;}
+.adr-context{font-size:13px;line-height:1.7;color:#333;background:#fff;border:1px solid #e8e8e6;border-radius:8px;padding:16px;}
+
+/* Criteria table */
+.adr-table{width:100%;border-collapse:collapse;border-radius:8px;overflow:hidden;border:1px solid #e8e8e6;background:#fff;font-size:12px;}
+.adr-table thead th{background:#fafaf8;font-size:11px;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:.04em;padding:9px 12px;text-align:left;border-bottom:1px solid #e8e8e6;}
+.adr-table tbody td{padding:10px 12px;border-bottom:1px solid #f2f2f0;vertical-align:top;line-height:1.5;}
+.adr-table tbody tr:last-child td{border-bottom:none;}
+.adr-table tbody tr:hover{background:#fafaf8;}
+.prio-badge{display:inline-flex;align-items:center;justify-content:center;width:20px;height:20px;border-radius:50%;font-size:11px;font-weight:700;background:#EEEDFE;color:#3C3489;}
+
+/* Evaluation table */
+.eval-wrap{overflow-x:auto;border-radius:8px;border:1px solid #e8e8e6;background:#fff;}
+.eval-table{width:100%;border-collapse:collapse;min-width:900px;font-size:12px;}
+.eval-table thead th{background:#fafaf8;font-size:11px;font-weight:600;color:#666;text-transform:uppercase;letter-spacing:.04em;padding:9px 12px;text-align:left;border-bottom:1px solid #e8e8e6;}
+.eval-table thead th:first-child{width:16%;min-width:130px;}
+.eval-table tbody td{padding:10px 12px;border-bottom:1px solid #f2f2f0;vertical-align:top;line-height:1.5;border-right:1px solid #f2f2f0;}
+.eval-table tbody td:last-child{border-right:none;}
+.eval-table tbody tr:last-child td{border-bottom:none;}
+.eval-table tbody tr:hover{background:#fafaf8;}
+.eval-table .sol-name{font-weight:600;font-size:12px;color:#1a1a18;}
+.eval-cell{font-size:12px;line-height:1.5;}
+.eval-cell .score{font-size:13px;margin-bottom:3px;display:block;}
+.eval-cell ul{list-style:none;padding:0;}
+.eval-cell ul li{font-size:11px;color:#555;padding-left:10px;position:relative;margin-bottom:2px;}
+.eval-cell ul li::before{content:'·';position:absolute;left:0;color:#aaa;}
+
+/* Score emojis legend */
+.score-legend{display:flex;flex-wrap:wrap;gap:8px;margin-top:10px;}
+.score-legend-item{font-size:11px;color:#666;background:#fff;border:1px solid #e8e8e6;border-radius:4px;padding:3px 9px;}
+
+/* Recommendation */
+.adr-reco{background:#fff;border:1px solid #b0abdd;border-radius:8px;padding:16px 20px;border-left:4px solid #3C3489;}
+.adr-reco-title{font-size:12px;font-weight:700;color:#3C3489;text-transform:uppercase;letter-spacing:.06em;margin-bottom:8px;}
+.adr-reco p{font-size:13px;line-height:1.7;color:#333;margin-bottom:8px;}
+.adr-reco p:last-child{margin-bottom:0;}
+
+/* Appendix */
+.appendix-block{background:#fff;border:1px solid #e8e8e6;border-radius:8px;padding:14px 16px;margin-bottom:12px;}
+.appendix-block h4{font-size:12px;font-weight:600;color:#555;margin-bottom:8px;}
+.appendix-block p, .appendix-block li{font-size:12px;color:#444;line-height:1.6;}
+.appendix-block ul{padding-left:16px;}
+.appendix-block li{margin-bottom:2px;}
+.appendix-table{width:100%;border-collapse:collapse;font-size:12px;margin-top:6px;}
+.appendix-table th{font-size:11px;font-weight:600;color:#666;text-transform:uppercase;padding:6px 10px;text-align:left;background:#fafaf8;border-bottom:1px solid #e8e8e6;}
+.appendix-table td{padding:7px 10px;border-bottom:1px solid #f2f2f0;color:#444;}
+.appendix-table tr:last-child td{border-bottom:none;}
+
+/* Dismissed badge */
+.badge-ecarte{background:#FCEBEB;color:#A32D2D;font-size:11px;padding:2px 8px;border-radius:4px;font-weight:600;}
+.badge-recommande{background:#EAF3DE;color:#3B6D11;font-size:11px;padding:2px 8px;border-radius:4px;font-weight:600;}
+.badge-conditionnel{background:#FAEEDA;color:#854F0B;font-size:11px;padding:2px 8px;border-radius:4px;font-weight:600;}
+
 .footer{margin-top:16px;font-size:11px;color:#aaa;}
 </style>
 </head>
 <body>
+
 <h1>Cartographie SI La Nef — Analyse Mambu / Theodo</h1>
-<p class="subtitle">Version 6 — Q&R officiel La Nef + Forest Admin + RFP processeur carte particuliers · Confidentiel</p>
+<p class="subtitle">Version 5 — Q&R officiel La Nef + Forest Admin + RFP processeur carte particuliers (Oaklen) · Confidentiel</p>
+
+<!-- TABS -->
+<div class="tabs">
+  <button class="tab-btn active" onclick="showTab('carto',this)">🗺 Cartographie SI</button>
+  <button class="tab-btn" onclick="showTab('adr',this)">📋 ADR — Stratégie de migration</button>
+</div>
+
+<!-- ============================================================ -->
+<!-- TAB 1 : CARTOGRAPHIE -->
+<!-- ============================================================ -->
+<div id="tab-carto" class="tab-panel active">
 
 <div class="legend">
-  <strong style="font-size:11px;color:#888;margin-right:4px;">Importance :</strong>
-  <span class="badge i-critique">Critique</span>
-  <span class="badge i-moyenne">Moyenne</span>
-  <span class="badge i-faible">Faible</span>
-  &nbsp;
-  <strong style="font-size:11px;color:#888;margin-right:4px;">Outil cible :</strong>
-  <span class="badge t-mambu">Couvert Mambu</span>
-  <span class="badge t-forest">Couvert Forest</span>
-  <span class="badge t-partner">Partenaire requis</span>
-  <span class="badge t-theodo">À faire Theodo</span>
-  <span class="badge t-tbd">À qualifier</span>
-  <span class="badge t-out">Disparaît avec CBS</span>
+  <span class="badge b-ok">En place</span>
+  <span class="badge b-partial">Partiel / à revoir</span>
+  <span class="badge b-missing">Absent Mambu</span>
+  <span class="badge b-partner">Partenaire requis</span>
+  <span class="badge b-forest">Couvert par Forest</span>
+  <span class="badge b-integrator">Porté intégrateur</span>
+  <span class="badge b-remove">Disparaît avec CBS</span>
+  <span class="badge b-tbd">À qualifier</span>
 </div>
 
 <div class="filter-group">
   <span class="filter-label">Domaine :</span>
-  <button class="active" onclick="fD('all',this)">Tout</button>
-  <button onclick="fD('cbs',this)">Core banking</button>
-  <button onclick="fD('pay',this)">Paiements</button>
-  <button onclick="fD('reg',this)">Réglementaire</button>
-  <button onclick="fD('front',this)">Front / Distribution</button>
-  <button onclick="fD('data',this)">Data / Reporting</button>
-  <button onclick="fD('ops',this)">Ops / Infra</button>
+  <button class="filter-btn active" onclick="fD('all',this)">Tout</button>
+  <button class="filter-btn" onclick="fD('cbs',this)">Core banking</button>
+  <button class="filter-btn" onclick="fD('pay',this)">Paiements</button>
+  <button class="filter-btn" onclick="fD('reg',this)">Réglementaire</button>
+  <button class="filter-btn" onclick="fD('front',this)">Front / Distribution</button>
+  <button class="filter-btn" onclick="fD('data',this)">Data / Reporting</button>
+  <button class="filter-btn" onclick="fD('ops',this)">Ops / Infra</button>
 </div>
-
 <div class="filter-group">
-  <span class="filter-label">Importance :</span>
-  <button class="active" onclick="fI('all',this)">Toutes</button>
-  <button onclick="fI('critique',this)">🔴 Critique</button>
-  <button onclick="fI('moyenne',this)">🟡 Moyenne</button>
-  <button onclick="fI('faible',this)">🟢 Faible</button>
+  <span class="filter-label">Sévérité :</span>
+  <button class="filter-btn active" onclick="fS('all',this)">Toutes</button>
+  <button class="filter-btn" onclick="fS('high',this)">🔴 Élevée</button>
+  <button class="filter-btn" onclick="fS('med',this)">🟡 Moyenne</button>
+  <button class="filter-btn" onclick="fS('low',this)">🟢 Faible</button>
+  <button class="filter-btn" onclick="fS('na',this)">— N/A</button>
 </div>
-
 <div class="filter-group">
-  <span class="filter-label">Outil cible :</span>
-  <button class="active" onclick="fT('all',this)">Tous</button>
-  <button onclick="fT('mambu',this)">Mambu</button>
-  <button onclick="fT('forest',this)">🌿 Forest</button>
-  <button onclick="fT('partner',this)">Partenaire</button>
-  <button onclick="fT('theodo',this)">Theodo</button>
-  <button onclick="fT('tbd',this)">À qualifier</button>
-  <button onclick="fT('out',this)">Disparaît</button>
+  <span class="filter-label">Forest :</span>
+  <button class="filter-btn active" onclick="fF('all',this)">Tout</button>
+  <button class="filter-btn" onclick="fF('forest',this)">🌿 Couvert par Forest</button>
+  <button class="filter-btn" onclick="fF('noforest',this)">Sans Forest</button>
 </div>
 
 <div class="count" id="cnt"></div>
-
 <div class="table-wrap">
-<table>
-<thead><tr>
-  <th>Domaine</th>
-  <th>Brique fonctionnelle</th>
-  <th>Outil actuel</th>
-  <th>Outil cible</th>
-  <th>Importance</th>
-  <th>Note &amp; mitigation</th>
-</tr></thead>
-<tbody id="tb"></tbody>
-</table>
+  <table>
+    <thead><tr>
+      <th>Domaine</th><th>Brique fonctionnelle</th><th>Outil actuel / cible</th>
+      <th>Statut Mambu</th><th>Sévérité</th><th>Forest Admin</th><th>Note &amp; mitigation</th>
+    </tr></thead>
+    <tbody id="tb"></tbody>
+  </table>
 </div>
+
+</div><!-- /tab-carto -->
+
+
+<!-- ============================================================ -->
+<!-- TAB 2 : ADR -->
+<!-- ============================================================ -->
+<div id="tab-adr" class="tab-panel">
+<div class="adr-wrap">
+
+  <div class="adr-header">
+    <h2>Stratégie de migration Core Banking System</h2>
+    <div class="adr-meta">
+      <span>👤 Owner : Aurélien Calot (Theodo Fintech)</span>
+      <span>📅 Dernière mise à jour : 21/05/2026</span>
+      <span>🔒 Usage interne — Confidentiel</span>
+    </div>
+  </div>
+
+  <!-- CONTEXT -->
+  <div class="adr-section">
+    <div class="adr-section-title">Contexte</div>
+    <div class="adr-context">
+      La Nef est une coopérative bancaire agréée ACPR dont le Core Banking System actuel (Capital Banking Solutions / CBS) génère des dysfonctionnements majeurs : reportings réglementaires erronés, blocages sur le lancement de nouveaux produits crédit et épargne, instabilité des API, difficultés comptables, et manque d'ouverture pour les équipes front de NefLab. L'éditeur CBS exige par ailleurs une montée de version lourde (modules crédit + comptabilité), ce qui a déclenché la réflexion sur une migration vers un CBS nouvelle génération.<br><br>
+      Deux jalons produit structurants contraignent le calendrier : la <strong>carte pro</strong> (déjà en production avec risques de qualité) et le <strong>compte courant particulier avec carte</strong> (go-live cible : oct-nov 2027). Les équipes internes de la Nef sont volontairement réduites, le modèle assumant une externalisation forte des prestations IT. L'appel d'offres couvre la solution CBS, son hébergement, l'infogérance technique et la TMA — un périmètre tout-en-un impératif.
+    </div>
+  </div>
+
+  <!-- CRITERIA -->
+  <div class="adr-section">
+    <div class="adr-section-title">Critères de sélection</div>
+    <table class="adr-table">
+      <thead><tr><th style="width:5%">#</th><th style="width:30%">Critère</th><th>Pourquoi ce critère ?</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><span class="prio-badge">1</span></td>
+          <td><strong>Maîtrise du risque réglementaire &amp; comptable</strong></td>
+          <td>La Nef est sous agrément ACPR ; des reportings erronés existent déjà. Toute période de cohabitation entre deux CBS crée un risque de double comptabilité ou d'incohérence réglementaire pouvant menacer l'agrément.</td>
+        </tr>
+        <tr>
+          <td><span class="prio-badge">2</span></td>
+          <td><strong>Capacité opérationnelle de la Nef pendant la transition</strong></td>
+          <td>Les équipes internes sont très réduites. Faire cohabiter deux CBS, deux éditeurs, deux prestataires d'infogérance mobilise une capacité de pilotage que la Nef ne dispose pas en interne.</td>
+        </tr>
+        <tr>
+          <td><span class="prio-badge">3</span></td>
+          <td><strong>Time-to-market sur les jalons produit critiques</strong></td>
+          <td>Le compte courant particulier avec carte est attendu pour oct-nov 2027. Le choix de migration ne doit pas bloquer ce jalon ni forcer à mener deux chantiers CBS en parallèle.</td>
+        </tr>
+        <tr>
+          <td><span class="prio-badge">4</span></td>
+          <td><strong>Coût total sur la période de transition</strong></td>
+          <td>Un double run (deux CBS, deux hébergements, deux TMA) génère des coûts cumulatifs qui peuvent rapidement annuler l'avantage du progressif sur le Big Bang.</td>
+        </tr>
+        <tr>
+          <td><span class="prio-badge">5</span></td>
+          <td><strong>Réversibilité &amp; risque d'échec projet</strong></td>
+          <td>Un échec de migration sur un établissement de crédit agréé peut avoir des conséquences réglementaires graves. La stratégie doit intégrer des points de contrôle et des options de rollback.</td>
+        </tr>
+      </tbody>
+    </table>
+  </div>
+
+  <!-- EVALUATION -->
+  <div class="adr-section">
+    <div class="adr-section-title">Évaluation</div>
+    <div class="eval-wrap">
+      <table class="eval-table">
+        <thead><tr>
+          <th>Solution</th>
+          <th>1. Risque réglementaire &amp; comptable</th>
+          <th>2. Capacité opérationnelle Nef</th>
+          <th>3. Time-to-market jalons</th>
+          <th>4. Coût transition</th>
+          <th>5. Réversibilité &amp; risque projet</th>
+        </tr></thead>
+        <tbody>
+          <tr>
+            <td><span class="sol-name">A. Big Bang global</span></td>
+            <td class="eval-cell"><span class="score">🟢🟢🟢</span><ul><li>Pas de cohabitation comptable : un seul CBS actif à la bascule</li><li>Risque concentré mais éliminé après</li><li>Compta reste dans CBS jusqu'à bascule → continuité réglementaire</li></ul></td>
+            <td class="eval-cell"><span class="score">🟢🟢🟢</span><ul><li>Un seul projet, un seul interlocuteur</li><li>Pas de run parallèle pour les équipes Nef</li><li>Conduite du changement concentrée sur une seule fenêtre</li></ul></td>
+            <td class="eval-cell"><span class="score">🟠🟠</span><ul><li>Préparation Big Bang : 18-24 mois minimum</li><li>Risque de décalage du jalon compte particulier</li><li>Peut obliger à démarrer sur CBS malgré ses limitations</li></ul></td>
+            <td class="eval-cell"><span class="score">🟢🟢🟢🟢</span><ul><li>Aucun double run</li><li>Coût concentré sur la phase projet, pas de surcoût récurrent</li></ul></td>
+            <td class="eval-cell"><span class="score">🟠</span><ul><li>Tout-ou-rien : un blocage en fin de projet est difficile à rollback</li><li>L'auditeur CBS a prévenu que la Nef ne peut y arriver seule</li><li>Reprise de données complexe sur l'ensemble du périmètre</li></ul></td>
+          </tr>
+          <tr>
+            <td><span class="sol-name">B. Big Bang séquencé <small>(part → pro)</small> <span class="badge-ecarte">Écarté</span></span></td>
+            <td class="eval-cell"><span class="score">🔴</span><ul><li>Cohabitation comptable pendant 6-12 mois (compta part dans Mambu, pro dans CBS)</li><li>Reportings réglementaires consolidés très difficiles à garantir</li><li>Risque ACPR significatif</li></ul></td>
+            <td class="eval-cell"><span class="score">🔴</span><ul><li>Deux CBS actifs simultanément : double pilotage, double TMA</li><li>Gestionnaires naviguant entre deux outils</li><li>Conduite du changement la plus complexe</li></ul></td>
+            <td class="eval-cell"><span class="score">🟢🟢</span><ul><li>Permet de lancer le compte part sur Mambu rapidement</li><li>Mais interdépendances comptables peuvent ralentir la phase 2</li></ul></td>
+            <td class="eval-cell"><span class="score">🔴</span><ul><li>Double hébergement, TMA, licences</li><li>Interfaces CBS↔Mambu non standards → développements spécifiques</li><li>Coût le plus élevé des quatre options</li></ul></td>
+            <td class="eval-cell"><span class="score">🟠</span><ul><li>Rollback partiel possible par phase</li><li>Mais l'interdépendance comptable rend le rollback de phase 2 très risqué si phase 1 est live</li></ul></td>
+          </tr>
+          <tr>
+            <td><span class="sol-name">C. Migration progressive <small>(Build-forward)</small></span></td>
+            <td class="eval-cell"><span class="score">🟠🟠</span><ul><li>Moins risqué que B car choix du périmètre de départ</li><li>Compta reste CBS tant qu'elle n'est pas migrée → imports/exports comptables inter-CBS</li><li>Forest Admin orchestre la réconciliation mais ajoute de la complexité</li></ul></td>
+            <td class="eval-cell"><span class="score">🟠</span><ul><li>Moins lourd que B mais deux environnements CBS à piloter</li><li>Équipes opérationnelles naviguent entre deux systèmes</li><li>Dépend de la qualité des APIs CBS pour les flux inter-CBS</li></ul></td>
+            <td class="eval-cell"><span class="score">🟢🟢🟢🟢</span><ul><li>Nouveaux produits lancés directement sur Mambu</li><li>Découple jalons innovation des jalons migration</li><li>Approche "Build-forward" validée par Theodo + Forest Admin</li></ul></td>
+            <td class="eval-cell"><span class="score">🟠</span><ul><li>Double run plus court que B mais réel</li><li>Interfaces CBS↔Mambu à chiffrer (non standards)</li><li>Forest Admin ajoute coût de licence et d'intégration</li></ul></td>
+            <td class="eval-cell"><span class="score">🟢🟢🟢</span><ul><li>Migration module par module → points de contrôle réguliers</li><li>Rollback possible à chaque étape</li><li>Approche la plus testée dans les migrations fintech modernes</li></ul></td>
+          </tr>
+          <tr>
+            <td><span class="sol-name">D. Statu quo + montée de version CBS</span></td>
+            <td class="eval-cell"><span class="score">🟠🟠</span><ul><li>Pas de risque de transition immédiat</li><li>Mais reportings erronés actuels perdurent</li><li>Montée de version CBS (crédit + compta) comporte des risques de régression</li></ul></td>
+            <td class="eval-cell"><span class="score">🟢🟢🟢🟢</span><ul><li>Aucun changement de système</li><li>Équipes déjà formées sur CBS</li></ul></td>
+            <td class="eval-cell"><span class="score">🔴</span><ul><li>Blocages actuels sur nouveaux produits persistent</li><li>Montée de version peut geler les développements 6-12 mois</li><li>NefLab reste bloquée sur des APIs instables</li></ul></td>
+            <td class="eval-cell"><span class="score">🟠🟠</span><ul><li>Coût montée de version non négligeable</li><li>Mais pas de double run ni de coût de migration</li><li>Reporte le coût sans l'éliminer</li></ul></td>
+            <td class="eval-cell"><span class="score">🟢🟢</span><ul><li>Pas de risque projet de migration</li><li>Mais reporte la dette technique et les risques réglementaires actuels</li><li>Agrément sous pression avec les reportings erronés existants</li></ul></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+    <div class="score-legend" style="margin-top:10px;">
+      <span class="score-legend-item">🟢🟢🟢🟢 Excellent</span>
+      <span class="score-legend-item">🟢🟢🟢 Très bon</span>
+      <span class="score-legend-item">🟢🟢 Bon</span>
+      <span class="score-legend-item">🟠🟠 Moyen</span>
+      <span class="score-legend-item">🟠 Faible</span>
+      <span class="score-legend-item">🔴 Ne satisfait pas le critère</span>
+    </div>
+  </div>
+
+  <!-- RECOMMENDATION -->
+  <div class="adr-section">
+    <div class="adr-section-title">Recommandation</div>
+    <div class="adr-reco">
+      <div class="adr-reco-title">Option recommandée : A. Big Bang global <span class="badge-recommande">Recommandé</span> — ou C. Migration progressive <span class="badge-conditionnel">Si délai insuffisant</span></div>
+      <p>L'option <strong>B (Big Bang séquencé part → pro) est à écarter</strong> : la cohabitation comptable entre deux CBS est le scénario le plus risqué réglementairement et le plus coûteux opérationnellement, pour un bénéfice time-to-market réel mais fragile. L'option <strong>D (statu quo)</strong> n'est viable que si la montée de version CBS s'avère moins risquée que la migration — hypothèse peu probable au regard des difficultés actuelles.</p>
+      <p>Entre A et C, le juge de paix est le <strong>planning</strong> : si Mambu + Theodo peuvent garantir un go-live Big Bang avant <strong>juin 2027</strong> (laissant 4 mois de marge sur le jalon carte particulier), le Big Bang global est préférable pour sa simplicité opérationnelle et l'absence de double comptabilité.</p>
+      <p>Si ce délai n'est pas tenable, l'option C (Build-forward) permet de démarrer le compte particulier directement sur Mambu sans attendre la migration complète — à condition de provisionner le coût des interfaces CBS↔Mambu et d'accepter une période de double run maîtrisée avec <strong>Forest Admin</strong> comme couche de réconciliation.</p>
+      <p><strong>Point de vigilance critique</strong> : la capacité de CBS à fournir des interfaces de transition exploitables reste non confirmée. Ce point conditionne la faisabilité de l'option C et doit être éclairci en cadrage.</p>
+    </div>
+  </div>
+
+  <!-- APPENDICES -->
+  <div class="adr-section">
+    <div class="adr-section-title">Annexes</div>
+
+    <div class="appendix-block">
+      <h4>A. Périmètre CBS actuel (Capital Banking Solutions)</h4>
+      <ul>
+        <li>Tenue de compte (particuliers et professionnels)</li>
+        <li>Crédit (particuliers et professionnels) — module concerné par la montée de version exigée</li>
+        <li>Comptabilité bancaire — source des reportings réglementaires ; concernée par la montée de version</li>
+        <li>Reporting réglementaire (via éditeur tiers racheté par CBS)</li>
+        <li>~18 applications périphériques connectées (WeBank/Alsimaray, NefLab, KYC/AML, virements BPCE PS, etc.)</li>
+      </ul>
+    </div>
+
+    <div class="appendix-block">
+      <h4>B. Contraintes identifiées sur l'option progressive (C)</h4>
+      <ul>
+        <li>CBS ne dispose pas d'interfaces standard pour recevoir des données d'un CBS tiers : développements spécifiques nécessaires</li>
+        <li>La vision 360 client, la gestion des limites/autorisations et le calcul des prélèvements sont profondément imbriqués dans CBS</li>
+        <li>Forest Admin peut servir de couche de réconciliation bi-CBS mais ajoute un coût de licence et une dépendance supplémentaire</li>
+      </ul>
+    </div>
+
+    <div class="appendix-block">
+      <h4>C. Jalons produit structurants</h4>
+      <table class="appendix-table">
+        <thead><tr><th>Produit</th><th>Statut</th><th>Jalon cible</th></tr></thead>
+        <tbody>
+          <tr><td>Carte pro</td><td>En production (tests) — risques qualité API CBS</td><td>Déjà lancé</td></tr>
+          <tr><td>Espace client particulier (lot 1 &amp; 2)</td><td>En cours avec CBS (API)</td><td>H1 2026</td></tr>
+          <tr><td>Compte courant particulier + carte (lot 3)</td><td>Non lancé</td><td>Oct-Nov 2027</td></tr>
+        </tbody>
+      </table>
+    </div>
+
+    <div class="appendix-block">
+      <h4>D. Recommandation de l'auditeur CBS externe</h4>
+      <p>L'auditeur financier mandaté par la Nef a conclu : (1) migrer la comptabilité en premier, (2) un Big Bang est nécessaire car la Nef ne peut pas réussir une migration seule, (3) la montée de version CBS est l'alternative de référence si la migration s'avère infaisable dans les délais.</p>
+    </div>
+  </div>
+
+</div><!-- /adr-wrap -->
+</div><!-- /tab-adr -->
+
 <p class="footer">Sources : dossier consultation La Nef, transcript qualification, Q&R officiel, analyse fonctionnelle Mambu, débrief CRO Forest Admin, RFP processeur carte particuliers. Usage interne Theodo / confidentiel.</p>
 
 <script>
-// targets: array of {cls, label}
+/* ---- TAB SWITCHER ---- */
+function showTab(id, btn) {
+  document.querySelectorAll('.tab-panel').forEach(function(p){ p.classList.remove('active'); });
+  document.querySelectorAll('.tab-btn').forEach(function(b){ b.classList.remove('active'); });
+  document.getElementById('tab-' + id).classList.add('active');
+  btn.classList.add('active');
+}
+
+/* ---- CARTOGRAPHIE DATA & FILTERS ---- */
 var R = [
-  {d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Tenue de compte (parts & pros)',o:'Capital Banker',imp:'moyenne',impl:'Moyenne',
-   t:[{c:'t-mambu',l:'Couvert Mambu'}],
-   n:'Couvert nativement par Mambu. À migrer en priorité.'},
-
-  {d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Crédit (conso, immo, pros)',o:'Capital Banker',imp:'critique',impl:'Critique',
-   t:[{c:'t-mambu',l:'Couvert Mambu'},{c:'t-forest',l:'Forest B1'}],
-   n:'Tenue de compte et encours couverts par Mambu. Forbearance et restructurations limitées dans Mambu standard — Forest B1 : workflow guidé forbearance/restructuration/créances douteuses, validation comité multi-niveau, écriture CBS, trace ACPR. Pain #1 du RFP. 5 975 prêts + 11 739 garanties à migrer.'},
-
-  {d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Instruction de crédit',o:'Excel (pas d\'outil)',imp:'faible',impl:'Faible',
-   t:[{c:'t-tbd',l:'À qualifier'}],
-   n:'Géré sur Excel, sans outil interfacé CBS. La Nef intéressée si la solution couvre ce besoin. Opportunité à proposer en option (Forest ou BPM léger).'},
-
-  {d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Recouvrement / impayés',o:'Excel (pas d\'outil)',imp:'faible',impl:'Faible',
-   t:[{c:'t-tbd',l:'À qualifier'}],
-   n:'Relances et recouvrement sur Excel. La Nef intéressée par automatisation. À inclure en option dans la réponse.'},
-
-  {d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Épargne — minoration taux / dons',o:'Capital Banker',imp:'moyenne',impl:'Moyenne',
-   t:[{c:'t-mambu',l:'Couvert Mambu'},{c:'t-forest',l:'Forest B2'}],
-   n:'Produits épargne standard couverts par Mambu. Forest B2 : workflow annuel client pour choix répartition taux/don, association bénéficiaire, calcul intérêts modifié, écriture compta du don, reporting impact public. Signature produit La Nef. 56 500 livrets.'},
-
-  {d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Parts sociales (18 exigences)',o:'Capital Banker',imp:'critique',impl:'Critique',
-   t:[{c:'t-theodo',l:'À faire Theodo'}],
-   n:'Lacune structurelle Mambu confirmée. Aucun natif. Développement custom obligatoire (module Deposits ou API). Pas de maturité fixe (sans date de fin). Risque programme majeur — à traiter dès la Q/R.'},
-
-  {d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Comptabilité générale (PCB français)',o:'Capital Banker',imp:'critique',impl:'Critique',
-   t:[{c:'t-partner',l:'Partenaire requis'},{c:'t-theodo',l:'À faire Theodo'}],
-   n:'Mambu déverse la donnée comptable mais ne fait pas le PCB français (pas de grand livre FR, pas d\'arrêtés réglementaires, pas de rapprochement comptable). Partenaire comptable obligatoire : Aurea, SAB ou middleware Sage/Cegid. Theodo construit la couche de mapping et déversement. 2,5M mouvements comptables/an.'},
-
-  {d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Vision client 360 / CRM',o:'Hubspot + Zendesk',imp:'faible',impl:'Faible',
-   t:[{c:'t-forest',l:'Forest A1'}],
-   n:'Forest A1 (core product, en prod chez Qonto/Spendesk/100+ clients) : fiche client unifiée agrégeant CBS, CRM, ticketing, signature, KYC, conformité. Configuration de connecteurs sur systèmes existants, pas du build.'},
-
-  {d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Opérations sensibles (4 yeux, validation)',o:'Absent',imp:'moyenne',impl:'Moyenne',
-   t:[{c:'t-forest',l:'Forest A2'}],
-   n:'Forest A2 : workflow opérations sensibles (virement > seuil, modif RIB, clôture compte, opposition carte, modif plafond, procuration). Capture motif, validation 2nd collaborateur ou comité selon seuil, écriture Mambu, trace audit. Un seul moteur paramétrable.'},
-
-  {d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Tarification (70+ exigences)',o:'Capital Banker',imp:'moyenne',impl:'Moyenne',
-   t:[{c:'t-mambu',l:'Couvert Mambu'},{c:'t-theodo',l:'À faire Theodo'}],
-   n:'Mambu permet le paramétrage de fees par produit/compte/transaction. Granularité française (HT/TTC, commissions intervention, remises dérogatoires) à valider exigence par exigence — risque de développements spécifiques Theodo sur les cas non couverts.'},
-
-  {d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Workflows BPM (instructions complexes)',o:'Capital Banker',imp:'moyenne',impl:'Moyenne',
-   t:[{c:'t-forest',l:'Forest A2'},{c:'t-theodo',l:'À faire Theodo'}],
-   n:'Mambu Process Orchestrator pour workflows simples. Forest A2 couvre les opérations sensibles standardisées. Processus très complexes (dérogations tarifaires multi-niveaux) : développement Theodo ou BPM résiduel (Camunda).'},
-
-  {d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Réversibilité data (obligation RFP 7.4)',o:'Absent',imp:'faible',impl:'Faible',
-   t:[{c:'t-forest',l:'Forest B4'}],
-   n:'Forest B4 natif : APIs export, schéma normalisé, snapshot paramétrages, logs audit. Extraction industrialisée par design. Obligation contractuelle RFP section 7.4 — cocher cette case par défaut désamorce une objection comité.'},
-
-  {d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Middleware API (Capital Connect)',o:'Capital Connect (CBS)',imp:'faible',impl:'Faible',
-   t:[{c:'t-out',l:'Disparaît avec CBS'}],
-   n:'Remplacé par APIs natives Mambu. Aucun développement équivalent nécessaire.'},
-
-  {d:'pay',dl:'Paiements',dc:'d-pay',b:'SEPA SCT/SDD + Instant Payments + VOP',o:'BPCE PS + Numeral',imp:'faible',impl:'Faible',
-   t:[{c:'t-mambu',l:'Couvert Mambu'}],
-   n:'Mambu Payments Hub natif couvre SCT/SDD/IP/VOP. Partenariat BPCE PS annoncé sept. 2025 — BPCE PS déjà partenaire La Nef. Remplace Numeral.'},
-
-  {d:'pay',dl:'Paiements',dc:'d-pay',b:'Flux EBICS (relevés, émission)',o:'ELCIMAI + PROLIVAL',imp:'moyenne',impl:'Moyenne',
-   t:[{c:'t-tbd',l:'À qualifier'}],
-   n:'Aujourd\'hui via CBS. À qualifier : Mambu expose-t-il EBICS nativement ou faut-il un adaptateur côté ELCIMAI/PROLIVAL ?'},
-
-  {d:'pay',dl:'Paiements',dc:'d-pay',b:'Processing carte pros',o:'Marqeta (via Saga Corp)',imp:'moyenne',impl:'Moyenne',
-   t:[{c:'t-partner',l:'Partenaire requis'},{c:'t-forest',l:'Forest A3'}],
-   n:'Processeur = Marqeta, contrat via Saga Corp. Mambu n\'a pas de natif carte. Forest A3 : workflow cycle de vie carte (commande, activation, opposition, renouvellement, modif plafonds). Carte Nef Pro juin 2026 — urgent.'},
-
-  {d:'pay',dl:'Paiements',dc:'d-pay',b:'Processing carte particuliers',o:'Non défini',imp:'moyenne',impl:'Moyenne',
-   t:[{c:'t-partner',l:'Partenaire requis'},{c:'t-forest',l:'Forest A3'}],
-   n:'RFP séparé lancé par La Nef, piloté par Oaklen. Marqeta recommandé mais pas décidé. Forest A3 applicable quel que soit le processeur retenu. Aligner recommandation avec Oaklen.'},
-
-  {d:'pay',dl:'Paiements',dc:'d-pay',b:'Encaissement chèques',o:'CHEQUENET (Docaposte)',imp:'faible',impl:'Faible',
-   t:[{c:'t-partner',l:'Partenaire requis'}],
-   n:'La Nef n\'émet aucun chèque — encaissement uniquement. Mambu sans natif chèques. CHEQUENET (Docaposte) à maintenir et rebrancher.'},
-
-  {d:'pay',dl:'Paiements',dc:'d-pay',b:'LCR / effets de commerce',o:'MINOS (BPCE PS)',imp:'faible',impl:'Faible',
-   t:[{c:'t-partner',l:'Partenaire requis'}],
-   n:'Pas de natif Mambu. Interface MINOS (BPCE PS) à maintenir. Aucun Swift confirmé.'},
-
-  {d:'pay',dl:'Paiements',dc:'d-pay',b:'Détection de fraude',o:'Prismop',imp:'faible',impl:'Faible',
-   t:[{c:'t-partner',l:'Partenaire requis'}],
-   n:'Outil externe indépendant de CBS. Interface à rebrancher sur Mambu — faible charge.'},
-
-  {d:'reg',dl:'Réglementaire',dc:'d-reg',b:'Reporting prudentiel (COREP, FINREP, RUBA…)',o:'WKFS (via CBS)',imp:'moyenne',impl:'Moyenne',
-   t:[{c:'t-partner',l:'Partenaire requis'}],
-   n:'La Nef confirme : proposer un service de reporting en remplacement de WKFS. Partenaires cibles : Regnology, BearingPoint, Vermeg. Coûts de licence à intégrer au TCO.'},
-
-  {d:'reg',dl:'Réglementaire',dc:'d-reg',b:'XBRL / DORA / TRACFIN / OSCAMPS / QLB',o:'XBRL Express',imp:'moyenne',impl:'Moyenne',
-   t:[{c:'t-partner',l:'Partenaire requis'},{c:'t-theodo',l:'À faire Theodo'}],
-   n:'XBRL Express consomme déjà l\'infocentre pour TRACFIN, QLB, OSCAMPS. À rebrancher sur le nouvel infocentre Mambu. DORA : Mambu à inscrire au Registre d\'Information (ROI).'},
-
-  {d:'reg',dl:'Réglementaire',dc:'d-reg',b:'Gel des avoirs DG Trésor',o:'SFTP manuel (CBS)',imp:'moyenne',impl:'Moyenne',
-   t:[{c:'t-forest',l:'Forest B3'}],
-   n:'Forest B3 : ingestion automatique, parsing XML, criblage base clients temps réel, routing vers compliance officer, gel automatique si confirmé, trace audit, alimentation TRACFIN. Remplace le dépôt SFTP manuel actuel. 1-2 sprints.'},
-
-  {d:'reg',dl:'Réglementaire',dc:'d-reg',b:'AML / LCB-FT',o:'Capital Compliance + ERMES',imp:'moyenne',impl:'Moyenne',
-   t:[{c:'t-partner',l:'Partenaire requis'}],
-   n:'Mambu sans moteur AML/CFT français natif. Partenaires : ComplyAdvantage (connecteur Mambu documenté), Napier, Fircosoft. Capital Compliance à remplacer.'},
-
-  {d:'reg',dl:'Réglementaire',dc:'d-reg',b:'Loi Eckert (inactifs)',o:'Capital Compliance',imp:'faible',impl:'Faible',
-   t:[{c:'t-mambu',l:'Couvert Mambu'},{c:'t-theodo',l:'À faire Theodo'}],
-   n:'Module Eckert dans le scope. Interface à rebrancher sur Mambu. Theodo développe le connecteur.'},
-
-  {d:'reg',dl:'Réglementaire',dc:'d-reg',b:'Référentiels FR (SIRET, FICP, DG Trésor)',o:'Néant / CBS',imp:'moyenne',impl:'Moyenne',
-   t:[{c:'t-theodo',l:'À faire Theodo'}],
-   n:'Pas de connecteurs natifs Mambu aux référentiels français. À intégrer via APIs côté Theodo ou middleware dédié.'},
-
-  {d:'reg',dl:'Réglementaire',dc:'d-reg',b:'Évolutions réglementaires RUN',o:'Absent (porté CBS)',imp:'critique',impl:'Critique',
-   t:[{c:'t-theodo',l:'À faire Theodo'}],
-   n:'Mambu ne gère pas les évolutions réglementaires hors paiement. TMA dédiée Theodo avec engagement de délai par type d\'évolution (mineur/majeur). À chiffrer explicitement dans la réponse.'},
-
-  {d:'reg',dl:'Réglementaire',dc:'d-reg',b:'Hébergement cloud / conformité ACPR',o:'Hébergeur FR géré CBS',imp:'critique',impl:'Critique',
-   t:[{c:'t-theodo',l:'À faire Theodo'}],
-   n:'La Nef attend hébergement en France. Mambu SaaS only — pas d\'on-premise. Notification d\'externalisation ACPR obligatoire (arrêté nov. 2014). Theodo porte la couche infogérance et la conformité ACPR.'},
-
-  {d:'front',dl:'Front / Distribution',dc:'d-front',b:'Banque en ligne particuliers',o:'Capital Digital (=NET)',imp:'faible',impl:'Faible',
-   t:[{c:'t-out',l:'Disparaît avec CBS'}],
-   n:'Remplacé par NefLabs. Refonte SEL en cours (lots 1 & 2). Branchement natif sur APIs Mambu.'},
-
-  {d:'front',dl:'Front / Distribution',dc:'d-front',b:'Banque en ligne pros (Nef PRO)',o:'Saga Corp (DSP2)',imp:'faible',impl:'Faible',
-   t:[{c:'t-partner',l:'Partenaire requis'}],
-   n:'Pas de changement prévu. Saga Corp reste en place. Rebrancher APIs Mambu au lieu de CBS — faible charge.'},
-
-  {d:'front',dl:'Front / Distribution',dc:'d-front',b:'Souscription en ligne particuliers (SEL)',o:'Brevo + Yousign + Docaposte',imp:'faible',impl:'Faible',
-   t:[{c:'t-mambu',l:'Couvert Mambu'},{c:'t-theodo',l:'À faire Theodo'}],
-   n:'Refonte en cours, déjà API-first. Lot 3 à basculer sur Mambu. Theodo développe les connecteurs du lot 3.'},
-
-  {d:'front',dl:'Front / Distribution',dc:'d-front',b:'Éditique',o:'Docaposte (~100 docs/an)',imp:'faible',impl:'Faible',
-   t:[{c:'t-partner',l:'Partenaire requis'}],
-   n:'Pas de GED attendue. Éditique très limitée (~100 docs/an via infocentre). Docaposte à conserver et rebrancher.'},
-
-  {d:'data',dl:'Data / Reporting',dc:'d-data',b:'Infocentre (NORSYS, depuis 2019)',o:'NORSYS + CBS',imp:'critique',impl:'Critique',
-   t:[{c:'t-theodo',l:'À faire Theodo'}],
-   n:'Consommateurs actuels : Zendesk, Hubspot, Power BI, Metabase, screening PPE, éditique, XBRL Express (TRACFIN/OSCAMPS/QLB). Toutes les requêtes SQL sur tables CBS à réécrire. Chantier sous-estimé : 150-250 JH. La Nef : réaliste à remplacer mais charge importante.'},
-
-  {d:'data',dl:'Data / Reporting',dc:'d-data',b:'141 états de gestion',o:'CBS + NORSYS',imp:'moyenne',impl:'Moyenne',
-   t:[{c:'t-theodo',l:'À faire Theodo'}],
-   n:'États consommés par les salariés via interface web. Reconstruction via Power BI + data warehouse alimenté par Mambu Data Stream. Charge de qualification individuelle significative à anticiper dans le planning.'},
-
-  {d:'data',dl:'Data / Reporting',dc:'d-data',b:'Tableaux de bord (Power BI + Metabase)',o:'Power BI + Metabase',imp:'faible',impl:'Faible',
-   t:[{c:'t-theodo',l:'À faire Theodo'}],
-   n:'Sources à rebrancher sur Mambu Data Stream via nouvel infocentre. Theodo configure les nouveaux flux d\'alimentation.'},
-
-  {d:'data',dl:'Data / Reporting',dc:'d-data',b:'Screening PPE',o:'Outil dédié (via infocentre)',imp:'faible',impl:'Faible',
-   t:[{c:'t-theodo',l:'À faire Theodo'}],
-   n:'Consomme l\'infocentre. À rebrancher sur le nouvel infocentre alimenté par Mambu.'},
-
-  {d:'ops',dl:'Ops / Infra',dc:'d-ops',b:'Cybersécurité / SOC / SIEM',o:'Sekoia (SI interne)',imp:'moyenne',impl:'Moyenne',
-   t:[{c:'t-theodo',l:'À faire Theodo'}],
-   n:'Sekoia sur SI interne uniquement, pas sur machines CBS. La Nef préfère SOC propre chez le fournisseur, ou intégration des machines CBS dans Sekoia. Theodo porte ce périmètre dans l\'infogérance.'},
-
-  {d:'ops',dl:'Ops / Infra',dc:'d-ops',b:'Cockpit bascule bi-bank (migration)',o:'Absent',imp:'critique',impl:'Critique',
-   t:[{c:'t-forest',l:'Forest C1'}],
-   n:'Forest C1 : orchestration qui écrit dans CBS (tables Oracle / Capital Connect) ET dans Mambu (APIs natives), toggle par produit/client/opération, réconciliation comptable quotidienne, dashboard de bascule, rollback à l\'opération près. Sans cette couche, le scénario progressif n\'est pas crédible.'},
-
-  {d:'ops',dl:'Ops / Infra',dc:'d-ops',b:'Batch / ordonnancement',o:'CRONTAB (40 jobs)',imp:'faible',impl:'Faible',
-   t:[{c:'t-theodo',l:'À faire Theodo'}],
-   n:'40 jobs via CRONTAB — simple, pas de Control-M. Mambu End of Day process quotidien. Theodo orchestre la surveillance H24 du COB côté infogérance.'},
-
-  {d:'ops',dl:'Ops / Infra',dc:'d-ops',b:'Environnements hors-prod',o:'Géré CBS',imp:'faible',impl:'Faible',
-   t:[{c:'t-theodo',l:'À faire Theodo'}],
-   n:'Données anonymisées obligatoires en hors-prod. Disponibilité heures bureau suffisante. Proposition à formuler par Theodo en cohérence avec DORA.'},
-
-  {d:'ops',dl:'Ops / Infra',dc:'d-ops',b:'Migration données historiques',o:'CBS (source)',imp:'critique',impl:'Critique',
-   t:[{c:'t-theodo',l:'À faire Theodo'}],
-   n:'500K mvts financiers/an, 2,5M mvts comptables/an, 128 utilisateurs. Volumes faibles — conforte le Big Bang. Limitation Mambu : pas d\'import transactions historiques en flux (reprise en stock). La Nef attend recommandation de l\'intégrateur sur la stratégie.'},
-
-  {d:'ops',dl:'Ops / Infra',dc:'d-ops',b:'Support français / 24h24',o:'CBS (support FR)',imp:'faible',impl:'Faible',
-   t:[{c:'t-theodo',l:'À faire Theodo'}],
-   n:'Mambu privilégie l\'anglais / self-service. Support 24/7 en français à négocier contractuellement avec Theodo comme point de contact principal.'}
+{d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Tenue de compte (parts & pros)',o:'Capital Banker',s:'b-ok',sl:'En place',sv:'na',svl:'&mdash;',f:'',fl:'',n:'Couvert nativement par Mambu. À migrer en priorité.'},
+{d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Crédit (conso, immo, pros)',o:'Capital Banker',s:'b-partial',sl:'Partiel / à revoir',sv:'high',svl:'Élevée',f:'b-forest',fl:'Forest B1',n:'Forbearance et restructurations limitées dans Mambu standard. Forest B1 : workflow guidé forbearance/restructuration/créances douteuses — fiche unifiée, validation comité multi-niveau, écriture CBS, trace ACPR. Pain #1 du RFP. 5 975 prêts + 11 739 garanties à migrer.'},
+{d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Instruction de crédit',o:'Excel (pas d\'outil)',s:'b-missing',sl:'Absent Mambu',sv:'low',svl:'Faible',f:'',fl:'',n:'Géré sur Excel, sans outil interfacé CBS. La Nef intéressée si la solution couvre ce besoin. Opportunité à proposer en option.'},
+{d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Recouvrement / impayés',o:'Excel (pas d\'outil)',s:'b-missing',sl:'Absent Mambu',sv:'low',svl:'Faible',f:'',fl:'',n:'Relances et recouvrement sur Excel. La Nef intéressée par automatisation. À inclure en option.'},
+{d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Épargne — minoration taux / dons',o:'Capital Banker',s:'b-partial',sl:'Partiel / à revoir',sv:'med',svl:'Moyenne',f:'b-forest',fl:'Forest B2',n:'Forest B2 : workflow annuel client — choix répartition taux/don, association bénéficiaire, calcul intérêts modifié dans Mambu, écriture compta du don, reporting impact public. Signature produit La Nef. 56 500 livrets.'},
+{d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Parts sociales (18 exigences)',o:'Capital Banker',s:'b-missing',sl:'Absent Mambu',sv:'high',svl:'Élevée',f:'',fl:'',n:'Sans date de fin. Lacune structurelle Mambu confirmée. Développement custom obligatoire. Risque programme majeur.'},
+{d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Comptabilité générale (PCB français)',o:'Capital Banker',s:'b-partner',sl:'Partenaire requis',sv:'high',svl:'Élevée',f:'',fl:'',n:'Mambu déverse la donnée, ne fait pas le PCB français. Partenaire obligatoire : Aurea, SAB ou middleware Sage/Cegid. 2,5M mouvements comptables/an.'},
+{d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Vision client 360 / CRM',o:'Hubspot + Zendesk',s:'b-partial',sl:'Partiel / à revoir',sv:'low',svl:'Faible',f:'b-forest',fl:'Forest A1',n:'Forest A1 (core product, en prod chez Qonto/Spendesk/100+ clients) : fiche client unifiée agrégeant CBS, CRM, ticketing, signature, KYC, conformité. Configuration de connecteurs sur systèmes existants, pas du build.'},
+{d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Opérations sensibles (4 yeux, validation)',o:'Absent',s:'b-forest',sl:'Couvert par Forest',sv:'med',svl:'Moyenne',f:'b-forest',fl:'Forest A2',n:'Forest A2 : workflow opérations sensibles (virement > seuil, modif RIB, clôture, opposition carte, modif plafond, procuration). Motif, contrôle pré-requis CBS, validation 2nd collaborateur ou comité, écriture Mambu, trace audit. Un seul moteur paramétrable.'},
+{d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Tarification (70+ exigences)',o:'Capital Banker',s:'b-partial',sl:'Partiel / à revoir',sv:'med',svl:'Moyenne',f:'',fl:'',n:'Granularité française (HT/TTC, commissions intervention, remises dérogatoires) à valider exigence par exigence. Risque de nombreux développements spécifiques.'},
+{d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Workflows BPM',o:'Capital Banker',s:'b-partial',sl:'Partiel / à revoir',sv:'med',svl:'Moyenne',f:'b-forest',fl:'Forest A2',n:'Mambu Process Orchestrator pour workflows simples. Forest A2 couvre les opérations sensibles. Processus très complexes : BPM tiers résiduel possible (Camunda).'},
+{d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Réversibilité data (RFP 7.4)',o:'Absent',s:'b-forest',sl:'Couvert par Forest',sv:'low',svl:'Faible',f:'b-forest',fl:'Forest B4',n:'Forest B4 natif : APIs export, schéma normalisé, snapshot paramétrages, logs audit. Extraction industrialisée par design. Obligation contractuelle RFP section 7.4.'},
+{d:'cbs',dl:'Core banking',dc:'d-cbs',b:'Middleware API (Capital Connect)',o:'Capital Connect (CBS)',s:'b-remove',sl:'Disparaît avec CBS',sv:'na',svl:'&mdash;',f:'',fl:'',n:'Remplacé par APIs natives Mambu.'},
+{d:'pay',dl:'Paiements',dc:'d-pay',b:'SEPA SCT/SDD + Instant Payments + VOP',o:'BPCE PS + Numeral',s:'b-ok',sl:'En place',sv:'na',svl:'&mdash;',f:'',fl:'',n:'IP et VOP à couvrir en remplacement de Numeral. Mambu Payments Hub natif. Partenariat BPCE PS sept. 2025. VOP inclus.'},
+{d:'pay',dl:'Paiements',dc:'d-pay',b:'Flux EBICS',o:'ELCIMAI + PROLIVAL',s:'b-partial',sl:'Partiel / à revoir',sv:'med',svl:'Moyenne',f:'',fl:'',n:'Aujourd\'hui via CBS. Mambu EBICS natif ou adaptateur ? À qualifier.'},
+{d:'pay',dl:'Paiements',dc:'d-pay',b:'Processing carte pros',o:'Marqeta (via Saga Corp)',s:'b-partner',sl:'Partenaire requis',sv:'med',svl:'Moyenne',f:'b-forest',fl:'Forest A3',n:'Processeur = Marqeta, contrat via Saga Corp. Forest A3 : workflow cycle de vie carte (commande, activation, opposition, renouvellement, modif plafonds). Carte Nef Pro juin 2026 — urgent.'},
+{d:'pay',dl:'Paiements',dc:'d-pay',b:'Processing carte particuliers',o:'RFP en cours (Oaklen)',s:'b-tbd',sl:'À qualifier',sv:'med',svl:'Moyenne',f:'b-forest',fl:'Forest A3',n:'RFP séparé lancé par La Nef, piloté par Oaklen. Marqeta recommandé mais pas décidé. Forest A3 applicable quel que soit le processeur retenu. Aligner recommandation avec Oaklen.'},
+{d:'pay',dl:'Paiements',dc:'d-pay',b:'Encaissement chèques',o:'CHEQUENET (Docaposte)',s:'b-missing',sl:'Absent Mambu',sv:'low',svl:'Faible',f:'',fl:'',n:'La Nef n\'émet aucun chèque. Encaissement uniquement. CHEQUENET à maintenir.'},
+{d:'pay',dl:'Paiements',dc:'d-pay',b:'LCR / effets de commerce',o:'MINOS (BPCE PS)',s:'b-missing',sl:'Absent Mambu',sv:'low',svl:'Faible',f:'',fl:'',n:'Pas de natif Mambu. Interface MINOS à maintenir. Aucun Swift.'},
+{d:'pay',dl:'Paiements',dc:'d-pay',b:'Détection de fraude',o:'Prismop',s:'b-ok',sl:'En place',sv:'na',svl:'&mdash;',f:'',fl:'',n:'Outil externe. Interface à rebrancher sur Mambu.'},
+{d:'reg',dl:'Réglementaire',dc:'d-reg',b:'Reporting prudentiel (COREP, FINREP, RUBA…)',o:'WKFS → à remplacer',s:'b-partner',sl:'Partenaire requis',sv:'med',svl:'Moyenne',f:'',fl:'',n:'La Nef confirme : proposer un service de reporting en remplacement de WKFS. Partenaires : Regnology, BearingPoint, Vermeg.'},
+{d:'reg',dl:'Réglementaire',dc:'d-reg',b:'XBRL / DORA / TRACFIN / OSCAMPS / QLB',o:'XBRL Express',s:'b-partial',sl:'Partiel / à revoir',sv:'med',svl:'Moyenne',f:'',fl:'',n:'XBRL Express consomme déjà l\'infocentre pour TRACFIN, QLB, OSCAMPS. DORA : Mambu à inscrire au ROI.'},
+{d:'reg',dl:'Réglementaire',dc:'d-reg',b:'Gel des avoirs DG Trésor',o:'SFTP manuel via CBS',s:'b-forest',sl:'Couvert par Forest',sv:'med',svl:'Moyenne',f:'b-forest',fl:'Forest B3',n:'Forest B3 : ingestion automatique, parsing XML, criblage base clients temps réel, routing vers compliance officer, gel automatique si confirmé, trace audit, alimentation TRACFIN. Remplace le dépôt SFTP manuel. 1-2 sprints.'},
+{d:'reg',dl:'Réglementaire',dc:'d-reg',b:'AML / LCB-FT',o:'Capital Compliance + ERMES',s:'b-partner',sl:'Partenaire requis',sv:'med',svl:'Moyenne',f:'',fl:'',n:'Mambu sans moteur AML natif. ComplyAdvantage (connecteur documenté), Napier, Fircosoft. Capital Compliance à remplacer.'},
+{d:'reg',dl:'Réglementaire',dc:'d-reg',b:'Loi Eckert (inactifs)',o:'Capital Compliance',s:'b-ok',sl:'En place',sv:'na',svl:'&mdash;',f:'',fl:'',n:'Module Eckert dans le scope. Interface à rebrancher sur Mambu.'},
+{d:'reg',dl:'Réglementaire',dc:'d-reg',b:'Référentiels FR (SIRET, FICP, DG Trésor)',o:'Néant / CBS',s:'b-integrator',sl:'Porté intégrateur',sv:'med',svl:'Moyenne',f:'',fl:'',n:'Pas de connecteurs natifs Mambu. À intégrer via APIs côté Theodo.'},
+{d:'reg',dl:'Réglementaire',dc:'d-reg',b:'Évolutions réglementaires RUN',o:'Absent (porté CBS)',s:'b-integrator',sl:'Porté intégrateur',sv:'high',svl:'Élevée',f:'',fl:'',n:'Mambu ne gère pas les évolutions réglementaires hors paiement. TMA dédiée Theodo avec engagement de délai.'},
+{d:'reg',dl:'Réglementaire',dc:'d-reg',b:'Hébergement cloud / conformité ACPR',o:'Hébergeur FR géré CBS',s:'b-partial',sl:'Partiel / à revoir',sv:'high',svl:'Élevée',f:'',fl:'',n:'La Nef attend hébergement France. Mambu SaaS only. Notification externalisation ACPR obligatoire.'},
+{d:'front',dl:'Front / Distribution',dc:'d-front',b:'Banque en ligne particuliers',o:'Capital Digital → NefLabs',s:'b-remove',sl:'Disparaît avec CBS',sv:'na',svl:'&mdash;',f:'',fl:'',n:'Remplacé par NefLabs. Refonte SEL en cours. Branchement natif APIs Mambu.'},
+{d:'front',dl:'Front / Distribution',dc:'d-front',b:'Banque en ligne pros (Nef PRO)',o:'Saga Corp (DSP2)',s:'b-ok',sl:'En place',sv:'na',svl:'&mdash;',f:'',fl:'',n:'Pas de changement prévu. Saga Corp reste. Rebrancher APIs Mambu — faible charge.'},
+{d:'front',dl:'Front / Distribution',dc:'d-front',b:'Souscription en ligne particuliers (SEL)',o:'Brevo + Yousign + Docaposte',s:'b-partial',sl:'Partiel / à revoir',sv:'low',svl:'Faible',f:'',fl:'',n:'Refonte en cours, API-first. Lot 3 à basculer sur Mambu.'},
+{d:'front',dl:'Front / Distribution',dc:'d-front',b:'Éditique',o:'Docaposte (~100 docs/an)',s:'b-partner',sl:'Partenaire requis',sv:'low',svl:'Faible',f:'',fl:'',n:'Pas de GED attendue. Éditique très limitée (~100 docs/an). Docaposte à conserver.'},
+{d:'data',dl:'Data / Reporting',dc:'d-data',b:'Infocentre (NORSYS, depuis 2019)',o:'NORSYS + CBS',s:'b-partial',sl:'Partiel / à revoir',sv:'high',svl:'Élevée',f:'',fl:'',n:'Consommateurs : Zendesk, Hubspot, Power BI, Metabase, screening PPE, éditique, XBRL Express. La Nef : réaliste à remplacer mais charge importante. 150-250 JH estimés.'},
+{d:'data',dl:'Data / Reporting',dc:'d-data',b:'141 états de gestion',o:'CBS + NORSYS',s:'b-integrator',sl:'Porté intégrateur',sv:'med',svl:'Moyenne',f:'',fl:'',n:'Reconstruction via Power BI + data warehouse Mambu Data Stream. Charge de qualification individuelle à anticiper.'},
+{d:'data',dl:'Data / Reporting',dc:'d-data',b:'Tableaux de bord (Power BI + Metabase)',o:'Power BI + Metabase',s:'b-partial',sl:'Partiel / à revoir',sv:'low',svl:'Faible',f:'',fl:'',n:'Sources à rebrancher sur Mambu Data Stream via nouvel infocentre.'},
+{d:'data',dl:'Data / Reporting',dc:'d-data',b:'Réversibilité / export data (RFP 7.4)',o:'Absent',s:'b-forest',sl:'Couvert par Forest',sv:'low',svl:'Faible',f:'b-forest',fl:'Forest B4',n:'Forest B4 natif : APIs export, schéma normalisé, snapshot paramétrages, logs audit. Extraction industrialisée par design.'},
+{d:'ops',dl:'Ops / Infra',dc:'d-ops',b:'Cybersécurité / SOC / SIEM',o:'Sekoia (SI interne)',s:'b-partial',sl:'Partiel / à revoir',sv:'med',svl:'Moyenne',f:'',fl:'',n:'Sekoia sur SI interne uniquement. La Nef préfère SOC propre chez le fournisseur ou intégration machines CBS dans Sekoia.'},
+{d:'ops',dl:'Ops / Infra',dc:'d-ops',b:'Cockpit bascule bi-bank (migration)',o:'Absent',s:'b-forest',sl:'Couvert par Forest',sv:'high',svl:'Élevée',f:'b-forest',fl:'Forest C1',n:'Forest C1 : orchestration qui écrit dans CBS (tables Oracle / Capital Connect) ET dans Mambu (APIs natives), toggle par produit/client/opération, réconciliation comptable quotidienne, dashboard de bascule, rollback à l\'opération près. Sans cette couche, le scénario progressif n\'est pas crédible.'},
+{d:'ops',dl:'Ops / Infra',dc:'d-ops',b:'Batch / ordonnancement',o:'CRONTAB (40 jobs)',s:'b-partial',sl:'Partiel / à revoir',sv:'low',svl:'Faible',f:'',fl:'',n:'40 jobs via CRONTAB. Simple. Mambu End of Day quotidien. Surveillance COB H24 à orchestrer côté infogérant.'},
+{d:'ops',dl:'Ops / Infra',dc:'d-ops',b:'Environnements hors-prod',o:'Géré CBS',s:'b-tbd',sl:'À qualifier',sv:'low',svl:'Faible',f:'',fl:'',n:'Données anonymisées obligatoires. Dispo heures bureau suffisante. Proposition à formuler en cohérence avec DORA.'},
+{d:'ops',dl:'Ops / Infra',dc:'d-ops',b:'Migration données historiques',o:'CBS (source)',s:'b-partial',sl:'Partiel / à revoir',sv:'high',svl:'Élevée',f:'',fl:'',n:'500K mvts financiers/an, 2,5M mvts comptables/an, 128 utilisateurs. Volumes faibles — conforte Big Bang. La Nef attend recommandation intégrateur.'},
+{d:'ops',dl:'Ops / Infra',dc:'d-ops',b:'Support français / 24h24',o:'CBS (support FR)',s:'b-partial',sl:'Partiel / à revoir',sv:'low',svl:'Faible',f:'',fl:'',n:'Mambu en anglais / self-service. Support 24/7 FR à négocier contractuellement avec Theodo.'}
 ];
 
-var cD = 'all', cI = 'all', cT = 'all';
+var cD='all',cS='all',cF='all';
 
-function fD(v, b) {
-  cD = v;
-  document.querySelectorAll('.filter-group:nth-child(5) button').forEach(function(x) { x.classList.remove('active'); });
-  b.classList.add('active');
-  render();
-}
-function fI(v, b) {
-  cI = v;
-  document.querySelectorAll('.filter-group:nth-child(6) button').forEach(function(x) { x.classList.remove('active'); });
-  b.classList.add('active');
-  render();
-}
-function fT(v, b) {
-  cT = v;
-  document.querySelectorAll('.filter-group:nth-child(7) button').forEach(function(x) { x.classList.remove('active'); });
-  b.classList.add('active');
-  render();
-}
+function fD(v,b){cD=v;document.querySelectorAll('.filter-group:nth-child(5) .filter-btn').forEach(function(x){x.classList.remove('active');});b.classList.add('active');render();}
+function fS(v,b){cS=v;document.querySelectorAll('.filter-group:nth-child(6) .filter-btn').forEach(function(x){x.classList.remove('active');});b.classList.add('active');render();}
+function fF(v,b){cF=v;document.querySelectorAll('.filter-group:nth-child(7) .filter-btn').forEach(function(x){x.classList.remove('active');});b.classList.add('active');render();}
 
-function render() {
-  var f = R.slice();
-  if (cD !== 'all') f = f.filter(function(r) { return r.d === cD; });
-  if (cI !== 'all') f = f.filter(function(r) { return r.imp === cI; });
-  if (cT !== 'all') f = f.filter(function(r) {
-    return r.t.some(function(t) { return t.c === 't-' + cT; });
+function render(){
+  var f=R.slice();
+  if(cD!=='all')f=f.filter(function(r){return r.d===cD;});
+  if(cS!=='all')f=f.filter(function(r){return r.sv===cS;});
+  if(cF==='forest')f=f.filter(function(r){return r.f==='b-forest';});
+  if(cF==='noforest')f=f.filter(function(r){return r.f!=='b-forest';});
+  document.getElementById('cnt').textContent=f.length+' brique'+(f.length>1?'s':'')+' affichée'+(f.length>1?'s':'');
+  var ld=null,html='';
+  f.forEach(function(r){
+    var sd=r.d!==ld;ld=r.d;
+    var forestCell=r.f?'<span class="badge '+r.f+'">'+r.fl+'</span>':'<span style="color:#ccc;">—</span>';
+    html+='<tr>';
+    html+='<td>'+(sd?'<span class="dl '+r.dc+'">'+r.dl+'</span>':'')+'</td>';
+    html+='<td>'+r.b+'</td>';
+    html+='<td class="note">'+r.o+'</td>';
+    html+='<td><span class="badge '+r.s+'">'+r.sl+'</span></td>';
+    html+='<td><span class="badge s-'+r.sv+'">'+r.svl+'</span></td>';
+    html+='<td>'+forestCell+'</td>';
+    html+='<td class="note">'+r.n+'</td>';
+    html+='</tr>';
   });
-  document.getElementById('cnt').textContent = f.length + ' brique' + (f.length > 1 ? 's' : '') + ' affichée' + (f.length > 1 ? 's' : '');
-  var ld = null, html = '';
-  f.forEach(function(r) {
-    var sd = r.d !== ld; ld = r.d;
-    var targets = r.t.map(function(t) { return '<span class="badge ' + t.c + '">' + t.l + '</span>'; }).join('');
-    html += '<tr>';
-    html += '<td>' + (sd ? '<span class="dl ' + r.dc + '">' + r.dl + '</span>' : '') + '</td>';
-    html += '<td style="font-weight:500">' + r.b + '</td>';
-    html += '<td class="note">' + r.o + '</td>';
-    html += '<td>' + targets + '</td>';
-    html += '<td><span class="badge i-' + r.imp + '">' + r.impl + '</span></td>';
-    html += '<td class="note">' + r.n + '</td>';
-    html += '</tr>';
-  });
-  document.getElementById('tb').innerHTML = html;
+  document.getElementById('tb').innerHTML=html;
 }
 render();
 </script>
